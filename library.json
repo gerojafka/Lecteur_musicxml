@@ -64,6 +64,11 @@
                          "id":  "married-life-michael-giacchino-source",
                          "name":  "married-life-michael-giacchino.source",
                          "xml_url":  "./partitions/married-life-michael-giacchino-source.musicxml"
+                     },
+                     {
+                         "id":  "lettre-a-elise-max",
+                         "name":  "lettre-a-elise max",
+                         "xml_url":  "./partitions/lettre-a-elise-max.musicxml"
                      }
                  ]
 }
