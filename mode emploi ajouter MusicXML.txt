@@ -1,1 +1,6 @@
-Double-cliquez sur ajouter-partition.cmd, choisissez 1. Ajouter un morceau, puis sélectionnez le MusicXML. Il est copié dans partitions/, ajouté à library.json et le cache iPad est actualisé.
+
+- ajout par lot : sélectionnez plusieurs fichiers MusicXML avec Ctrl ou Maj ;
+- les fichiers non MusicXML sélectionnés sont associés automatiquement à leur
+  MusicXML homonyme ;
+- les doublons du même MusicXML sont ignorés ;
+- library.json et la version du cache iPad sont actualisés une seule fois.

@@ -14,6 +14,56 @@
                          "id":  "etude",
                          "name":  "Étude — démo du lecteur",
                          "xml_url":  "./partitions/etude.musicxml"
+                     },
+                     {
+                         "id":  "minuet-bwv-anhang-114-in-g-major-source",
+                         "name":  "minuet-bwv-anhang-114-in-g-major.source",
+                         "xml_url":  "./partitions/minuet-bwv-anhang-114-in-g-major-source.musicxml"
+                     },
+                     {
+                         "id":  "gravity-falls-opening-intermediate-piano-solo-source",
+                         "name":  "gravity-falls-opening-intermediate-piano-solo.source",
+                         "xml_url":  "./partitions/gravity-falls-opening-intermediate-piano-solo-source.musicxml"
+                     },
+                     {
+                         "id":  "love-story-francis-lai",
+                         "name":  "love-story-francis-lai",
+                         "xml_url":  "./partitions/love-story-francis-lai.musicxml"
+                     },
+                     {
+                         "id":  "bella-ciao-source",
+                         "name":  "bella-ciao.source",
+                         "xml_url":  "./partitions/bella-ciao-source.musicxml"
+                     },
+                     {
+                         "id":  "swan-lake-theme-tchaikovsky-source",
+                         "name":  "swan-lake-theme-tchaikovsky.source",
+                         "xml_url":  "./partitions/swan-lake-theme-tchaikovsky-source.musicxml"
+                     },
+                     {
+                         "id":  "passacaglia-source",
+                         "name":  "passacaglia.source",
+                         "xml_url":  "./partitions/passacaglia-source.musicxml"
+                     },
+                     {
+                         "id":  "jingle-bells-source",
+                         "name":  "jingle-bells.source",
+                         "xml_url":  "./partitions/jingle-bells-source.musicxml"
+                     },
+                     {
+                         "id":  "traumerei-piano-sheet-source",
+                         "name":  "traumerei-piano-sheet.source",
+                         "xml_url":  "./partitions/traumerei-piano-sheet-source.musicxml"
+                     },
+                     {
+                         "id":  "greensleeves-for-piano-easy-and-beautiful-source",
+                         "name":  "greensleeves-for-piano-easy-and-beautiful.source",
+                         "xml_url":  "./partitions/greensleeves-for-piano-easy-and-beautiful-source.musicxml"
+                     },
+                     {
+                         "id":  "married-life-michael-giacchino-source",
+                         "name":  "married-life-michael-giacchino.source",
+                         "xml_url":  "./partitions/married-life-michael-giacchino-source.musicxml"
                      }
                  ]
 }
