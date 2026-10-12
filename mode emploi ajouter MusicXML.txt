@@ -1,0 +1,1 @@
+Double-cliquez sur ajouter-partition.cmd, choisissez 1. Ajouter un morceau, puis sélectionnez le MusicXML. Il est copié dans partitions/, ajouté à library.json et le cache iPad est actualisé.
