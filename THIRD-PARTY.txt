@@ -1,0 +1,9 @@
+Verovio 6.3.0
+Copyright (c) the Verovio authors.
+License: GNU Lesser General Public License, version 3 or later.
+The distributed Verovio modules are unmodified npm package files.
+Project and corresponding source: https://github.com/rism-digital/verovio/tree/version-6.3.0
+Package: https://www.npmjs.com/package/verovio/v/6.3.0
+Reference: https://book.verovio.org/
+The replaceable library files are assets/verovio.mjs and assets/verovio-module.mjs.
+License texts are included under assets/.

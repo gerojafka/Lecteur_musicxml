@@ -1,0 +1,19 @@
+{
+    "sessions":  [
+                     {
+                         "id":  "gravity-falls",
+                         "name":  "Gravity Falls — piano",
+                         "xml_url":  "./partitions/gravity-falls.musicxml"
+                     },
+                     {
+                         "id":  "swan-lake",
+                         "name":  "Swan Lake — piano",
+                         "xml_url":  "./partitions/swan-lake.musicxml"
+                     },
+                     {
+                         "id":  "etude",
+                         "name":  "Étude — démo du lecteur",
+                         "xml_url":  "./partitions/etude.musicxml"
+                     }
+                 ]
+}
