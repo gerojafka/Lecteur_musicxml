@@ -1,0 +1,21 @@
+VERSION 25 — 9 octobre 2026
+
+Correction du curseur de la mesure 1 affiché à hauteur de la mesure 11.
+Les positions sont désormais mesurées sur les images à leur résolution originale.
+La détection doit retrouver tous les systèmes attendus dans le MusicXML.
+Le cadrage, le curseur et la sélection partagent les mêmes coordonnées.
+Le cadrage est limité à deux systèmes, centrés dans la fenêtre disponible.
+Les chargements de pages périmés sont ignorés après un retour au début.
+
+Tests : les deux pages de Gravity Falls, retour depuis la mesure 11 et depuis
+la page 2, redimensionnement 1180 x 950 vers 820 x 950, calculs de cadrage sur
+cinq tailles de fenêtre. Ces tests ne constituent pas une validation de tous
+les PDF possibles ni un essai sur un iPad physique.
+
+Pour utiliser cette version :
+1. Fermez la fenêtre du serveur de la version précédente.
+2. Extrayez tout le ZIP dans un nouveau dossier.
+3. Exécutez lancer.cmd dans ce dossier.
+4. Rechargez la page. Son titre doit contenir « Studio v25 ».
+
+Les dossiers et ZIP v24 et antérieurs ne sont pas modifiés.

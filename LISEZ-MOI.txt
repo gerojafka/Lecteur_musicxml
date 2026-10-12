@@ -1,0 +1,32 @@
+PARTITION VERS MIDI - STUDIO LOCAL
+
+DEMARRAGE
+1. Double-cliquez sur lancer.cmd.
+2. Le navigateur ouvre automatiquement http://127.0.0.1:8766.
+3. Laissez la fenêtre noire ouverte pendant l'utilisation.
+
+CONVERTIR UNE PARTITION
+1. Ouvrez l'onglet « Convertir ».
+2. Déposez un PDF de partition, puis cliquez sur « Reconnaître et convertir ».
+3. La partition est ajoutée au Studio avec son PDF, son MIDI et ses repères.
+
+UTILISER LE STUDIO
+- « Défilement continu » : le MIDI est joué et la barre rouge suit la partition.
+- « Attendre la note » : la barre avance seulement après les bonnes notes.
+- « Ecouter » : fait entendre les notes actuellement attendues.
+- Le piano virtuel permet de jouer directement avec la souris.
+- Le curseur « Vitesse » règle le tempo de lecture.
+
+CONNECTER UN CLAVIER CASIO
+1. Reliez le Casio à l'ordinateur en USB-MIDI et allumez-le.
+2. Utilisez Chrome ou Edge.
+3. Cliquez sur « Connecter le Casio » et autorisez l'accès MIDI.
+4. Le nom du clavier apparaît sous « Piano virtuel ».
+
+CONFIDENTIALITE ET FICHIERS
+127.0.0.1 désigne uniquement cet ordinateur : ce n'est pas un site Internet.
+Les partitions et conversions restent dans le dossier « conversions ».
+Fermez la fenêtre noire pour arrêter complètement l'application.
+
+PREALABLE
+Audiveris doit être installé dans C:\Program Files\Audiveris.
