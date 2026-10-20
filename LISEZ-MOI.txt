@@ -1,32 +1,71 @@
-PARTITION VERS MIDI - STUDIO LOCAL
+LECTEUR MUSICXML v26
+===================
 
-DEMARRAGE
-1. Double-cliquez sur lancer.cmd.
-2. Le navigateur ouvre automatiquement http://127.0.0.1:8766.
-3. Laissez la fenêtre noire ouverte pendant l'utilisation.
+Ce lecteur dessine la partition a partir du MusicXML deja prepare par le
+convertisseur. Il ne lit pas le PDF et ne controle pas la reconnaissance.
+Le son, les reprises, les mesures, les boucles et le curseur utilisent la meme
+chronologie musicale. Un MIDI separe n'est plus necessaire a la lecture.
 
-CONVERTIR UNE PARTITION
-1. Ouvrez l'onglet « Convertir ».
-2. Déposez un PDF de partition, puis cliquez sur « Reconnaître et convertir ».
-3. La partition est ajoutée au Studio avec son PDF, son MIDI et ses repères.
+SUR LE PC
+---------
+Extraire le ZIP entier puis double-cliquer sur lancer.cmd.
+Un serveur statique local ouvre le lecteur (ports 8776 a 8795).
+Il n'installe rien et ne demande pas les droits administrateur.
+Le Python deja present sur ce PC est utilise. Sinon installer Python 3.
+Ne pas ouvrir index.html avec file:// : les modules ont besoin de HTTP/HTTPS.
 
-UTILISER LE STUDIO
-- « Défilement continu » : le MIDI est joué et la barre rouge suit la partition.
-- « Attendre la note » : la barre avance seulement après les bonnes notes.
-- « Ecouter » : fait entendre les notes actuellement attendues.
-- Le piano virtuel permet de jouer directement avec la souris.
-- Le curseur « Vitesse » règle le tempo de lecture.
+SUR GITHUB / IPAD
+----------------
+Publier TOUT le contenu de ce dossier dans GitHub Pages. Conserver assets,
+partitions, library.json et les chemins relatifs. Aucun serveur Python,
+Audiveris, compte ou cle API n'est necessaire sur GitHub ou sur l'iPad.
+Ouvrir l'URL HTTPS du site dans votre navigateur iPad prenant en charge Web MIDI.
+La premiere ouverture met les fichiers du lecteur et la bibliotheque en cache.
+Le son commence apres une action (Lire, note ou clavier), comme l'exige iOS.
+Le fonctionnement hors ligne depend du maintien du stockage par le navigateur.
 
-CONNECTER UN CLAVIER CASIO
-1. Reliez le Casio à l'ordinateur en USB-MIDI et allumez-le.
-2. Utilisez Chrome ou Edge.
-3. Cliquez sur « Connecter le Casio » et autorisez l'accès MIDI.
-4. Le nom du clavier apparaît sous « Piano virtuel ».
+MORCEAUX
+--------
+Ouvrir accepte .musicxml, .xml et .mxl, avec plusieurs fichiers a la fois.
+Les fichiers ouverts ainsi restent sur cet appareil (IndexedDB). Ils ne sont
+pas envoyes sur GitHub. Pour les publier, utiliser ajouter-partition.cmd :
+choisir ajouter ou retirer, puis un seul fichier du morceau. Si vous choisissez
+le PDF ou MIDI, le script cherche le MusicXML de meme nom dans le meme dossier.
+Seul le MusicXML est copie. Le cache se met a jour automatiquement.
+Le retrait du catalogue conserve le fichier original dans partitions/.
 
-CONFIDENTIALITE ET FICHIERS
-127.0.0.1 désigne uniquement cet ordinateur : ce n'est pas un site Internet.
-Les partitions et conversions restent dans le dossier « conversions ».
-Fermez la fenêtre noire pour arrêter complètement l'application.
+UTILISATION
+-----------
+- Lire : lecture/pause ; Debut : premiere note et premiers systemes.
+- Deux systemes complets sont affiches, puis les deux suivants.
+- Cliquez sur une note ou utilisez les fleches pour vous y placer avec son.
+- Espace : lire/pause. Fleches gauche/droite : note. Haut/bas : tempo +/-5 BPM.
+- Tempo : indication MusicXML, 120 BPM si elle est absente. Minimum 5 BPM.
+- Boucle : mesures Debut/Fin, Activer. Pause 1 a 10 secondes. Quitter annule.
+- Un numero entre parentheses designe un passage repete de la meme mesure.
+- Attendre la note : appuyer sur Lire, puis jouer toutes les notes indiquees
+  pour avancer ; une note incorrecte ne fait pas avancer le curseur.
+- Connecter le Casio : lire les notes MIDI entrantes. Le piano virtuel reste
+  visible. Le bouton Clavier permet de masquer/afficher le piano a volonte.
+- FR/EN : texte et noms des notes. Jour/Nuit : apparence de l'interface.
 
-PREALABLE
-Audiveris doit être installé dans C:\Program Files\Audiveris.
+FICHIERS EXISTANTS
+-----------------
+Gravity Falls et Swan Lake sont des copies de vos anciens MusicXML, pas de
+nouvelles conversions verifiees. Le MusicXML Gravity Falls ne contient pas
+l'indication 160 BPM visible dans son ancien PDF et comporte des incoherences
+d'encodage d'accords. Ce lecteur reproduit les donnees qu'il peut interpreter.
+Ces points sont a traiter dans le convertisseur selon l'architecture convenue.
+
+MOTEUR ET LIMITES
+----------------
+Gravure et chronologie : Verovio 6.3.0, inclus localement. Son : synthese Web Audio.
+La mise en page est recalculee : elle ne reproduit pas la pagination du PDF.
+La prise en charge des signes musicaux et reprises est celle de Verovio.
+Les nuances fines et le pedalage ne sont pas simules par ce piano synthetique.
+Les changements de tempo suivent la chronologie fournie par Verovio (aux
+frontieres de mesures). Aucun controle de justesse acoustique par micro.
+Web MIDI depend du navigateur et de la connexion USB/Bluetooth disponible.
+
+Les versions v25 et anterieures sont conservees separement.
+Voir THIRD-PARTY.txt pour la licence du moteur embarque.

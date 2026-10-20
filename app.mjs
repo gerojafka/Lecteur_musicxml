@@ -3,7 +3,8 @@ import {VerovioToolkit} from './assets/verovio.mjs';
 import {makeTimeline,groupAt,noteStep,loopBounds} from './timeline.mjs';
 import {PianoAudio} from './audio.mjs';
 const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg';
-const state={lang:localStorage.getItem('v26-lang')||'fr',mode:'continuous',playing:false,group:0,base:0,rate:1,loop:null,waitHits:new Set(),systems:[],notesById:new Map(),measuresById:new Map(),catalog:[],token:0,pair:-1,voices:new Set()};
+const readRecent=()=>{try{return JSON.parse(localStorage.getItem('v26-recent-scores'))||{}}catch{return{}}};
+const state={lang:localStorage.getItem('v26-lang')||'fr',mode:'continuous',playing:false,group:0,base:0,rate:1,loop:null,waitHits:new Set(),systems:[],notesById:new Map(),measuresById:new Map(),catalog:[],token:0,pair:-1,voices:new Set(),veilSetting:localStorage.getItem('v26-veil-color')||'#ec4a7b',veilColor:'#ec4a7b',veilMeasure:null,recent:readRecent()};
 const audio=new PianoAudio();let toolkit,raf,loopTimer,waitTimer,loading=false,midiAccess;
 const translations={
  fr:{open:'Ouvrir',night:'Nuit',day:'Jour',continuous:'Défilement continu',wait:'Attendre la note',play:'▶ Lire',pause:'Ⅱ Pause',start:'⏮ Début',tempo:'Tempo',connect:'Connecter le Casio',connected:'MIDI connecté',keyboard:'Clavier',loop:'Boucle',from:'Début',to:'Fin',enable:'Activer',exit:'Quitter',gap:'Pause',welcome:'Votre partition, en musique.',choose:'Choisissez un MusicXML pour commencer.',loading:'Préparation de la partition…',piano:'Piano virtuel',touch:'Touchez les touches pour jouer',helpTitle:'Un lecteur autonome',helpText:'Ouvrez le MusicXML préparé par votre convertisseur. Le son et le curseur suivent les mêmes notes. Le PDF et le MIDI ne sont pas nécessaires.',helpKeys:'Espace : lecture / pause. ← et → : note précédente / suivante, avec son. ↑ et ↓ : tempo ±5 BPM. Cliquez sur une note pour vous y placer.',helpLoop:'Choisissez les mesures de début et de fin, puis Activez la boucle. Quitter retire la sélection. Les numéros entre parenthèses indiquent un passage répété.',helpLocal:'Les morceaux ouverts sont conservés sur cet appareil. Pour les publier sur GitHub, utilisez ajouter-partition.cmd puis envoyez le dossier complet.',close:'Fermer',measure:'Mesure',system:'Systèmes',ready:'Prêt à jouer',correct:'Correct',wrong:'Note différente',await:'Jouez les notes indiquées',finished:'Morceau terminé',loopPause:'Reprise dans',unsupported:'Web MIDI indisponible dans ce navigateur.',noMidi:'Aucun clavier MIDI détecté',denied:'Connexion MIDI refusée',error:'Impossible de lire ce MusicXML',remove:'Retirer ce morceau local ?',local:'local',emptyLibrary:'Ouvrir un MusicXML…'},
@@ -54,7 +55,7 @@ async function engrave(){
     const top=staffLines.length?Math.min(...staffLines.map(b=>b.y))-220:bounds.y;
     const bottom=staffLines.length?Math.max(...staffLines.map(b=>b.y))+300:bounds.y+bounds.height;
     const padding=180,x=Math.min(bounds.x,0)-padding,y=Math.min(bounds.y,top)-padding,w=Math.max(bounds.x+bounds.width,19500)-x+padding,h=Math.max(bounds.y+bounds.height,bottom)-y+padding;
-    const model={svg,index:state.systems.length,top,bottom,box:{x,y,w,h},measures:[],cursor:null};
+    const model={svg,index:state.systems.length,top,bottom,box:{x,y,w,h},measures:[],cursor:null,veil:null};
     for(const m of system.querySelectorAll('g.measure')){
      const id=m.id,meta=state.measuresById.get(id);if(!meta)continue;
      const b=relativeBox(m,svg);Object.assign(meta,{system:model.index,box:b});model.measures.push(meta);
@@ -63,6 +64,7 @@ async function engrave(){
      const meta=state.measuresById.get(note.closest('g.measure')?.id);const head=note.querySelector('.notehead')||note;const b=relativeBox(head,svg);
      state.notesById.set(note.id,{id:note.id,el:note,system:model.index,x:b.x+b.width/2,measure:meta});
     }
+    model.veil=svgElement('rect',{class:'measure-veil',x:0,y:top,width:0,height:bottom-top,visibility:'hidden'});svg.insertBefore(model.veil,system);
     model.cursor=svgElement('line',{class:'score-cursor',y1:top,y2:bottom,x1:0,x2:0,visibility:'hidden'});svg.append(model.cursor);
     svg.setAttribute('viewBox',`${x} ${y} ${w} ${h}`);svg.removeAttribute('width');svg.removeAttribute('height');svg.style.width='100%';svg.style.height='auto';
     svg.addEventListener('click',event=>{const note=event.target.closest('g.note,g.rest,g.mRest');if(!note)return;const choices=state.timeline.groups.map((g,i)=>g.ids.includes(note.id)?i:-1).filter(i=>i>=0);if(choices.length)seek(choices.find(i=>i>=state.group)??choices[0],true)});
@@ -91,6 +93,7 @@ async function loadScore(record){
   state.timeline=timeline;state.record=record;state.group=0;state.base=0;state.rate=1;state.loop=null;state.pair=-1;
   state.tempo=timeline.tempo;$('tempo').max=String(Math.max(300,Math.ceil(state.tempo)));$('tempo').value=String(Math.round(state.tempo));$('tempoValue').textContent=Math.round(state.tempo)+' BPM';
   const counts=new Map();for(const measure of timeline.measures){const meta=state.measuresById.get(measure.id);measure.meta=meta;const n=(counts.get(measure.id)||0)+1;counts.set(measure.id,n);measure.label=(meta?.label??String(measure.index+1))+(n>1?` (${n})`:'')}
+  for(const group of timeline.groups){if(group.measure?.startX!==undefined)continue;const first=group.ids.map(id=>state.notesById.get(id)).find(Boolean);if(first)group.measure.startX=first.x}
   for(const select of [$('loopFrom'),$('loopTo')])select.replaceChildren(...timeline.measures.map(m=>new Option(m.label,String(m.index))));
   $('loop').classList.remove('active');$('loop').textContent=tr('enable');buildPiano();updateTarget();feedback(tr('ready'));document.title=(record.name||'MusicXML')+' · Lecteur v26';
  }catch(error){console.error(error);state.timeline=null;state.systems=[];state.pair=-1;$('systems').replaceChildren();$('empty').hidden=false;feedback(tr('error')+' — '+error.message,'bad')}
@@ -108,10 +111,16 @@ function updateTarget(){
  const group=state.timeline?.groups[state.group];if(!group)return;
  let note=group.ids.map(id=>state.notesById.get(id)).find(Boolean),meta=group.measure?.meta||state.measuresById.get(group.measure?.id);
  if(!note&&meta?.system!==undefined)note={system:meta.system,x:meta.box.x+100};
- if(note){showPair(note.system);for(const model of state.systems)model.cursor.setAttribute('visibility','hidden');const model=state.systems[note.system];model.cursor.setAttribute('x1',note.x);model.cursor.setAttribute('x2',note.x);model.cursor.setAttribute('visibility','visible');$('score').dataset.system=note.system;$('score').dataset.note=group.ids[0]||''}
+ if(note){showPair(note.system);for(const model of state.systems){model.cursor.setAttribute('visibility','hidden');model.veil.setAttribute('visibility','hidden')}const model=state.systems[note.system];model.cursor.setAttribute('x1',note.x);model.cursor.setAttribute('x2',note.x);model.cursor.setAttribute('visibility','visible');paintVeil(model,meta,note.x,group.measure);$('score').dataset.system=note.system;$('score').dataset.note=group.ids[0]||''}
  for(const el of document.querySelectorAll('.current-note'))el.classList.remove('current-note');for(const id of group.ids)state.notesById.get(id)?.el.classList.add('current-note');
  $('position').textContent=tr('measure')+' '+(group.measure?.label||meta?.label||'—')+' · '+tr('system')+' '+(state.pair+1)+'–'+Math.min(state.pair+2,state.systems.length);
  $('clock').textContent=clock(group.time)+' / '+clock(state.timeline.duration);paintKeyboard();paintLoop();
+}
+function paintVeil(model,meta,cursorX,measure){
+ if(!meta)return;const measureKey=measure?.index??meta.ordinal;
+ if(state.veilMeasure!==measureKey){state.veilMeasure=measureKey;state.veilColor=state.veilSetting==='random'?['#ec4a7b','#4a90e2','#35a77a','#d99425','#8b6bd9'][Math.floor(Math.random()*5)]:state.veilSetting}
+ const startX=Math.max(meta.box.x,measure?.startX??cursorX),width=Math.max(0,Math.min(meta.box.width,cursorX-startX));
+ model.veil.setAttribute('x',startX);model.veil.setAttribute('width',width);model.veil.setAttribute('fill',state.veilColor);model.veil.setAttribute('visibility','visible');
 }
 function paintLoop(){
  const selected=new Set(state.loop?state.timeline.measures.slice(state.loop.from,state.loop.to+1).map(m=>m.id):[]);
@@ -124,6 +133,7 @@ async function audition(){await audio.unlock();state.timeline?.groups[state.grou
 function firstPlayable(index){while(index<state.timeline.groups.length-1&&!state.timeline.groups[index].notes.length)index++;return index}
 async function play(){
  if(!state.timeline||loading)return;await audio.unlock();
+ rememberPlayed(state.record);
  if(state.base>=state.timeline.duration-.001)seek(0);
  if(state.loop&&(state.base<state.loop.start||state.base>=state.loop.end))seek(groupAt(state.timeline.groups,state.loop.start));
  state.waitHits.clear();state.playing=true;$('play').textContent=tr('pause');
@@ -134,7 +144,7 @@ async function play(){
 function tick(){
  if(!state.playing||state.mode!=='continuous')return;
  const time=currentTime(),end=state.loop?.end??state.timeline.duration;
- if(time>=end-.00001){if(state.loop){loopPause();return}stop();state.base=state.timeline.duration;state.group=state.timeline.groups.length-1;updateTarget();feedback(tr('finished'));return}
+ if(time>=end-.00001){if(state.loop){loopPause();return}stop();state.base=0;state.group=0;updateTarget();feedback(tr('finished'));return}
  const nextGroup=groupAt(state.timeline.groups,time);if(nextGroup!==state.group){state.group=nextGroup;updateTarget()}
  while(state.nextNote<state.timeline.notes.length){const n=state.timeline.notes[state.nextNote];if(n.start>=end-1e-6||n.start>time+.09*state.rate)break;state.nextNote++;if(n.end<time)continue;audio.play(n.pitch,audio.ctx.currentTime+Math.max(0,(n.start-time)/state.rate),Math.max(.03,(Math.min(end,n.end)-Math.max(n.start,time))/state.rate))}
  $('clock').textContent=clock(time)+' / '+clock(state.timeline.duration);raf=requestAnimationFrame(tick);
@@ -156,13 +166,13 @@ function buildPiano(){
 }
 function paintKeyboard(){
  const expected=new Set(state.timeline?.groups[state.group]?.notes.map(n=>n.pitch)||[]);$('piano').querySelectorAll('.note-name').forEach(n=>n.remove());
- for(const key of $('piano').querySelectorAll('.key')){const pitch=+key.dataset.pitch;key.classList.toggle('expected',expected.has(pitch));key.setAttribute('aria-label',noteName(pitch));if(key.querySelector('.c-label'))key.querySelector('.c-label').textContent=noteName(pitch);if(expected.has(pitch)){const name=document.createElement('span');name.className='note-name';name.textContent=noteName(pitch);name.style.left=(parseFloat(key.style.left)+(key.classList.contains('black')?10:16))+'px';$('piano').append(name)}}
+ for(const key of $('piano').querySelectorAll('.key')){const pitch=+key.dataset.pitch;key.classList.toggle('expected',expected.has(pitch));key.setAttribute('aria-label',noteName(pitch));if(key.querySelector('.c-label'))key.querySelector('.c-label').textContent=noteName(pitch);if(expected.has(pitch)){const name=document.createElement('span');name.className='note-name';name.textContent=noteName(pitch);key.append(name)}}
 }
 async function inputNote(pitch,velocity=90){
  await audio.unlock();audio.play(pitch,0,2,velocity);const key=$('piano').querySelector(`[data-pitch="${pitch}"]`);key?.classList.add('pressed');
  const group=state.timeline?.groups[state.group];if(!group)return;const expected=new Set(group.notes.map(n=>n.pitch));
  const correct=expected.has(pitch);feedback(tr(correct?'correct':'wrong')+' · '+noteName(pitch),correct?'good':'bad');if(!correct){key?.classList.add('wrong');setTimeout(()=>key?.classList.remove('wrong'),300)}
- if(state.mode==='wait'&&state.playing&&correct&&!waitTimer){state.waitHits.add(pitch);if([...expected].every(p=>state.waitHits.has(p))){waitTimer=setTimeout(()=>{waitTimer=null;state.waitHits.clear();let next=firstPlayable(state.group+1);if(state.loop&&(next>=state.timeline.groups.length||state.timeline.groups[next].time>=state.loop.end)){loopPause();return}if(next>=state.timeline.groups.length){stop();feedback(tr('finished'));return}state.group=next;state.base=state.timeline.groups[next].time;updateTarget();feedback(tr('await'))},140)}}
+ if(state.mode==='wait'&&state.playing&&correct&&!waitTimer){state.waitHits.add(pitch);if([...expected].every(p=>state.waitHits.has(p))){waitTimer=setTimeout(()=>{waitTimer=null;state.waitHits.clear();let next=firstPlayable(state.group+1);if(state.loop&&(next>=state.timeline.groups.length||state.timeline.groups[next].time>=state.loop.end)){loopPause();return}if(next>=state.timeline.groups.length){stop();state.base=0;state.group=0;updateTarget();feedback(tr('finished'));return}state.group=next;state.base=state.timeline.groups[next].time;updateTarget();feedback(tr('await'))},140)}}
 }
 function releaseNote(pitch){audio.release(pitch);$('piano').querySelector(`[data-pitch="${pitch}"]`)?.classList.remove('pressed')}
 async function connectMidi(){
@@ -174,13 +184,18 @@ let database;
 function db(){return database??=new Promise((resolve,reject)=>{const request=indexedDB.open('musicxml-reader-v26',1);request.onupgradeneeded=()=>request.result.createObjectStore('scores',{keyPath:'id'});request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error)})}
 async function storedScores(){try{const d=await db();return await new Promise((resolve,reject)=>{const r=d.transaction('scores').objectStore('scores').getAll();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}catch{return[]}}
 async function persist(record){try{const d=await db();await new Promise((resolve,reject)=>{const tx=d.transaction('scores','readwrite');tx.objectStore('scores').put(record);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}catch{feedback(state.lang==='fr'?'Morceau ouvert pour cette séance uniquement.':'Score opened for this session only.')}}
-function refreshOptions(){const previous=$('library').value;$('library').replaceChildren(...state.catalog.map(r=>new Option(r.name+(r.data?' · '+tr('local'):''),r.id)));if(state.catalog.some(r=>r.id===previous))$('library').value=previous;if(!state.catalog.length)$('library').append(new Option(tr('emptyLibrary'),''))}
+function sortCatalog(){state.catalog=state.catalog.map((record,index)=>({record,index})).sort((a,b)=>(state.recent[b.record.id]||0)-(state.recent[a.record.id]||0)||a.index-b.index).map(({record})=>record)}
+function refreshOptions(selectedId=$('library').value){$('library').replaceChildren(...state.catalog.map(r=>new Option(r.name+(r.data?' · '+tr('local'):''),r.id)));if(state.catalog.some(r=>r.id===selectedId))$('library').value=selectedId;if(!state.catalog.length)$('library').append(new Option(tr('emptyLibrary'),''))}
+function rememberPlayed(record){if(!record?.id)return;state.recent[record.id]=Date.now();localStorage.setItem('v26-recent-scores',JSON.stringify(state.recent));sortCatalog();refreshOptions(record.id)}
 async function openFiles(files){const records=[];for(const file of files){const record={id:'local-'+file.name,name:file.name.replace(/\.(musicxml|xml|mxl)$/i,''),filename:file.name,data:await file.arrayBuffer()};await persist(record);const old=state.catalog.findIndex(r=>r.id===record.id);if(old>=0)state.catalog[old]=record;else state.catalog.push(record);records.push(record)}refreshOptions();if(records.length){$('library').value=records[0].id;await loadScore(records[0])}}
 
 $('play').onclick=()=>state.playing||state.loopWaiting?stop():play();$('start').onclick=()=>{seek(0);feedback(tr('ready'))};$('prev').onclick=()=>state.timeline&&seek(noteStep(state.timeline.groups,state.group,-1),true);$('next').onclick=()=>state.timeline&&seek(noteStep(state.timeline.groups,state.group,1),true);
 $('mode').onclick=()=>{stop();state.mode=state.mode==='continuous'?'wait':'continuous';$('mode').textContent=tr(state.mode);feedback(tr(state.mode==='wait'?'await':'ready'))};
 $('tempo').oninput=e=>setTempo(+e.target.value);$('slower').onclick=()=>setTempo(+$('tempo').value-5);$('faster').onclick=()=>setTempo(+$('tempo').value+5);
 $('loop').onclick=()=>state.loop?clearLoop():changeLoop();$('loopFrom').onchange=$('loopTo').onchange=()=>{if(state.loop)changeLoop()};$('gap').oninput=()=>{$('gapValue').textContent=$('gap').value+' s'};
+$('veilColor').value=['#ec4a7b','#4a90e2','#35a77a','#d99425','#8b6bd9','random'].includes(state.veilSetting)?state.veilSetting:'custom';$('veilCustomColor').value=state.veilSetting==='random'?'#ec4a7b':state.veilSetting;
+function setVeilColor(value){state.veilSetting=value;state.veilMeasure=null;localStorage.setItem('v26-veil-color',value);updateTarget()}
+$('veilColor').onchange=e=>{if(e.target.value==='random')setVeilColor('random');else if(e.target.value!=='custom'){$('veilCustomColor').value=e.target.value;setVeilColor(e.target.value)}};$('veilCustomColor').oninput=e=>{$('veilColor').value='custom';setVeilColor(e.target.value)};
 $('midi').onclick=connectMidi;$('pianoToggle').onclick=()=>{document.body.classList.toggle('no-piano');$('pianoToggle').setAttribute('aria-pressed',String(!document.body.classList.contains('no-piano')));fitSystems()};
 $('lang').onclick=()=>{state.lang=state.lang==='fr'?'en':'fr';localStorage.setItem('v26-lang',state.lang);translate();refreshOptions()};$('theme').onclick=()=>{document.body.classList.toggle('night');localStorage.setItem('v26-theme',document.body.classList.contains('night')?'night':'day');translate()};document.body.classList.toggle('night',localStorage.getItem('v26-theme')==='night');
 $('open').onclick=()=>$('files').click();$('files').onchange=async()=>{await openFiles([...$('files').files]);$('files').value=''};$('library').onchange=()=>{const record=state.catalog.find(r=>r.id===$('library').value);if(record)loadScore(record)};
@@ -189,5 +204,5 @@ document.addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(e.target
 window.addEventListener('resize',fitSystems);new ResizeObserver(fitSystems).observe($('score'));
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.playing)stop()});
 translate();buildPiano();const modulePromise=createModule();
-try{const response=await fetch('./library.json');if(response.ok){const data=await response.json();state.catalog=Array.isArray(data)?data:data.sessions||[]}state.catalog.push(...await storedScores());refreshOptions();if(state.catalog.length)await loadScore(state.catalog[0])}catch(error){feedback(error.message,'bad')}
+try{const response=await fetch('./library.json');if(response.ok){const data=await response.json();state.catalog=Array.isArray(data)?data:data.sessions||[]}state.catalog.push(...await storedScores());sortCatalog();refreshOptions();if(state.catalog.length)await loadScore(state.catalog[0])}catch(error){feedback(error.message,'bad')}
 if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./service-worker.js').catch(()=>{});

@@ -16,59 +16,259 @@
                          "xml_url":  "./partitions/etude.musicxml"
                      },
                      {
-                         "id":  "minuet-bwv-anhang-114-in-g-major-source",
-                         "name":  "minuet-bwv-anhang-114-in-g-major.source",
-                         "xml_url":  "./partitions/minuet-bwv-anhang-114-in-g-major-source.musicxml"
+                         "id":  "40-me-symphonie-de-mozart-niveau-3",
+                         "name":  "40 me Symphonie de Mozart niveau 3",
+                         "xml_url":  "./partitions/40-me-symphonie-de-mozart-niveau-3.musicxml"
                      },
                      {
-                         "id":  "gravity-falls-opening-intermediate-piano-solo-source",
-                         "name":  "gravity-falls-opening-intermediate-piano-solo.source",
-                         "xml_url":  "./partitions/gravity-falls-opening-intermediate-piano-solo-source.musicxml"
+                         "id":  "adagio",
+                         "name":  "adagio",
+                         "xml_url":  "./partitions/adagio.musicxml"
                      },
                      {
-                         "id":  "love-story-francis-lai",
-                         "name":  "love-story-francis-lai",
-                         "xml_url":  "./partitions/love-story-francis-lai.musicxml"
+                         "id":  "ah-vous-dirai-je-maman",
+                         "name":  "ah-vous-dirai-je-maman",
+                         "xml_url":  "./partitions/ah-vous-dirai-je-maman.musicxml"
                      },
                      {
-                         "id":  "bella-ciao-source",
-                         "name":  "bella-ciao.source",
-                         "xml_url":  "./partitions/bella-ciao-source.musicxml"
+                         "id":  "amazinggrace",
+                         "name":  "AmazingGrace",
+                         "xml_url":  "./partitions/amazinggrace.musicxml"
                      },
                      {
-                         "id":  "swan-lake-theme-tchaikovsky-source",
-                         "name":  "swan-lake-theme-tchaikovsky.source",
-                         "xml_url":  "./partitions/swan-lake-theme-tchaikovsky-source.musicxml"
+                         "id":  "aura-lee-love-me-tender",
+                         "name":  "aura-lee-love-me-tender",
+                         "xml_url":  "./partitions/aura-lee-love-me-tender.musicxml"
                      },
                      {
-                         "id":  "passacaglia-source",
-                         "name":  "passacaglia.source",
-                         "xml_url":  "./partitions/passacaglia-source.musicxml"
+                         "id":  "bella-ciao-la-casa-de-papel-niveau-2",
+                         "name":  "Bella Ciao La casa de papel niveau 2",
+                         "xml_url":  "./partitions/bella-ciao-la-casa-de-papel-niveau-2.musicxml"
                      },
                      {
-                         "id":  "jingle-bells-source",
-                         "name":  "jingle-bells.source",
-                         "xml_url":  "./partitions/jingle-bells-source.musicxml"
+                         "id":  "berceuse-de-brahms",
+                         "name":  "berceuse-de-brahms",
+                         "xml_url":  "./partitions/berceuse-de-brahms.musicxml"
                      },
                      {
-                         "id":  "traumerei-piano-sheet-source",
-                         "name":  "traumerei-piano-sheet.source",
-                         "xml_url":  "./partitions/traumerei-piano-sheet-source.musicxml"
+                         "id":  "chanson-de-printemps",
+                         "name":  "chanson-de-printemps",
+                         "xml_url":  "./partitions/chanson-de-printemps.musicxml"
                      },
                      {
-                         "id":  "greensleeves-for-piano-easy-and-beautiful-source",
-                         "name":  "greensleeves-for-piano-easy-and-beautiful.source",
-                         "xml_url":  "./partitions/greensleeves-for-piano-easy-and-beautiful-source.musicxml"
+                         "id":  "douce-nuit-chant-de-no-l-niveau-2",
+                         "name":  "Douce Nuit chant de No l niveau 2",
+                         "xml_url":  "./partitions/douce-nuit-chant-de-no-l-niveau-2.musicxml"
                      },
                      {
-                         "id":  "married-life-michael-giacchino-source",
-                         "name":  "married-life-michael-giacchino.source",
-                         "xml_url":  "./partitions/married-life-michael-giacchino-source.musicxml"
+                         "id":  "etude-opus-10-3",
+                         "name":  "etude-opus-10-3",
+                         "xml_url":  "./partitions/etude-opus-10-3.musicxml"
                      },
                      {
-                         "id":  "lettre-a-elise-max",
-                         "name":  "lettre-a-elise max",
-                         "xml_url":  "./partitions/lettre-a-elise-max.musicxml"
+                         "id":  "franceurbaine",
+                         "name":  "FranceUrbaine",
+                         "xml_url":  "./partitions/franceurbaine.musicxml"
+                     },
+                     {
+                         "id":  "frere-jacques",
+                         "name":  "frere-jacques",
+                         "xml_url":  "./partitions/frere-jacques.musicxml"
+                     },
+                     {
+                         "id":  "fur-elise-simplifiee",
+                         "name":  "fur_elise_simplifiee",
+                         "xml_url":  "./partitions/fur-elise-simplifiee.musicxml"
+                     },
+                     {
+                         "id":  "gymnopedie-1",
+                         "name":  "gymnopedie-1",
+                         "xml_url":  "./partitions/gymnopedie-1.musicxml"
+                     },
+                     {
+                         "id":  "harry-potter-piano-niveau-1",
+                         "name":  "Harry Potter piano niveau 1",
+                         "xml_url":  "./partitions/harry-potter-piano-niveau-1.musicxml"
+                     },
+                     {
+                         "id":  "hey-jude-beatles-niveau-2",
+                         "name":  "Hey Jude Beatles niveau 2",
+                         "xml_url":  "./partitions/hey-jude-beatles-niveau-2.musicxml"
+                     },
+                     {
+                         "id":  "hymne-la-joie-de-beethoven",
+                         "name":  "Hymne la joie de Beethoven",
+                         "xml_url":  "./partitions/hymne-la-joie-de-beethoven.musicxml"
+                     },
+                     {
+                         "id":  "invention-1",
+                         "name":  "invention-1",
+                         "xml_url":  "./partitions/invention-1.musicxml"
+                     },
+                     {
+                         "id":  "la-panth-re-rose-niveau-2",
+                         "name":  "La Panth re Rose niveau 2",
+                         "xml_url":  "./partitions/la-panth-re-rose-niveau-2.musicxml"
+                     },
+                     {
+                         "id":  "la-mort-d-ase-tod-death",
+                         "name":  "la-mort-d-ase-tod-death",
+                         "xml_url":  "./partitions/la-mort-d-ase-tod-death.musicxml"
+                     },
+                     {
+                         "id":  "le-beau-danube-bleu",
+                         "name":  "le-beau-danube-bleu",
+                         "xml_url":  "./partitions/le-beau-danube-bleu.musicxml"
+                     },
+                     {
+                         "id":  "le-cygne",
+                         "name":  "le-cygne",
+                         "xml_url":  "./partitions/le-cygne.musicxml"
+                     },
+                     {
+                         "id":  "les-aristochats-niveau-2",
+                         "name":  "Les aristochats niveau 2",
+                         "xml_url":  "./partitions/les-aristochats-niveau-2.musicxml"
+                     },
+                     {
+                         "id":  "les-saisons-juin-barcarolle",
+                         "name":  "les-saisons-juin-barcarolle",
+                         "xml_url":  "./partitions/les-saisons-juin-barcarolle.musicxml"
+                     },
+                     {
+                         "id":  "lettre-a-elise-notes-francais",
+                         "name":  "lettre_a_elise_notes_francais",
+                         "xml_url":  "./partitions/lettre-a-elise-notes-francais.musicxml"
+                     },
+                     {
+                         "id":  "lib-r-e-d-livr-e-1-re-partie-niveau-3",
+                         "name":  "Lib r e d livr e 1 re partie niveau 3",
+                         "xml_url":  "./partitions/lib-r-e-d-livr-e-1-re-partie-niveau-3.musicxml"
+                     },
+                     {
+                         "id":  "marche-turque-classique-niveau-3",
+                         "name":  "Marche Turque Classique niveau 3",
+                         "xml_url":  "./partitions/marche-turque-classique-niveau-3.musicxml"
+                     },
+                     {
+                         "id":  "menuet-anh-116",
+                         "name":  "menuet_anh_116",
+                         "xml_url":  "./partitions/menuet-anh-116.musicxml"
+                     },
+                     {
+                         "id":  "methode-rose-page-29-c-est-gentil",
+                         "name":  "Méthode Rose, page 29_ C\u0027est Gentil",
+                         "xml_url":  "./partitions/methode-rose-page-29-c-est-gentil.musicxml"
+                     },
+                     {
+                         "id":  "mistral-gagnant-renaud-niveau-3",
+                         "name":  "Mistral Gagnant Renaud niveau 3",
+                         "xml_url":  "./partitions/mistral-gagnant-renaud-niveau-3.musicxml"
+                     },
+                     {
+                         "id":  "mozart-pour-d-butant-niveau-1",
+                         "name":  "Mozart pour d butant niveau 1",
+                         "xml_url":  "./partitions/mozart-pour-d-butant-niveau-1.musicxml"
+                     },
+                     {
+                         "id":  "nocturne-20",
+                         "name":  "nocturne-20",
+                         "xml_url":  "./partitions/nocturne-20.musicxml"
+                     },
+                     {
+                         "id":  "ode-a-la-joie",
+                         "name":  "ode-a-la-joie",
+                         "xml_url":  "./partitions/ode-a-la-joie.musicxml"
+                     },
+                     {
+                         "id":  "oh-when-the-saints",
+                         "name":  "oh-when-the-saints",
+                         "xml_url":  "./partitions/oh-when-the-saints.musicxml"
+                     },
+                     {
+                         "id":  "petits-moulins-a-vent",
+                         "name":  "petits-moulins-a-vent",
+                         "xml_url":  "./partitions/petits-moulins-a-vent.musicxml"
+                     },
+                     {
+                         "id":  "pirate-des-caraibes-niveau-3",
+                         "name":  "Pirate des Caraibes niveau 3",
+                         "xml_url":  "./partitions/pirate-des-caraibes-niveau-3.musicxml"
+                     },
+                     {
+                         "id":  "prelude-bwv-846",
+                         "name":  "prelude-bwv-846",
+                         "xml_url":  "./partitions/prelude-bwv-846.musicxml"
+                     },
+                     {
+                         "id":  "reverie-traumerie",
+                         "name":  "reverie-traumerie",
+                         "xml_url":  "./partitions/reverie-traumerie.musicxml"
+                     },
+                     {
+                         "id":  "river-flows-in-you-2-me-partie-niveau-3",
+                         "name":  "River flows in you 2 me partie niveau 3",
+                         "xml_url":  "./partitions/river-flows-in-you-2-me-partie-niveau-3.musicxml"
+                     },
+                     {
+                         "id":  "shallow-2-a-star-is-born-niveau-3",
+                         "name":  "Shallow 2 A Star is Born niveau 3",
+                         "xml_url":  "./partitions/shallow-2-a-star-is-born-niveau-3.musicxml"
+                     },
+                     {
+                         "id":  "sonate-au-clair-de-lune",
+                         "name":  "sonate-au-clair-de-lune",
+                         "xml_url":  "./partitions/sonate-au-clair-de-lune.musicxml"
+                     },
+                     {
+                         "id":  "sonate-pathetique-adagio",
+                         "name":  "sonate-pathetique-adagio",
+                         "xml_url":  "./partitions/sonate-pathetique-adagio.musicxml"
+                     },
+                     {
+                         "id":  "star-wars-la-marche-imp-riale-niveau-1",
+                         "name":  "Star Wars La marche imp riale niveau 1",
+                         "xml_url":  "./partitions/star-wars-la-marche-imp-riale-niveau-1.musicxml"
+                     },
+                     {
+                         "id":  "tchaikovsky-waltzzadbeg2",
+                         "name":  "tchaikovsky_waltzzadbeg2",
+                         "xml_url":  "./partitions/tchaikovsky-waltzzadbeg2.musicxml"
+                     },
+                     {
+                         "id":  "the-entertainer-niveau-3",
+                         "name":  "The entertainer niveau 3",
+                         "xml_url":  "./partitions/the-entertainer-niveau-3.musicxml"
+                     },
+                     {
+                         "id":  "the-sound-of-silence-niveau-3",
+                         "name":  "The Sound of Silence niveau 3",
+                         "xml_url":  "./partitions/the-sound-of-silence-niveau-3.musicxml"
+                     },
+                     {
+                         "id":  "toccata-en-mi-mineur-914",
+                         "name":  "toccata-en-mi-mineur-914",
+                         "xml_url":  "./partitions/toccata-en-mi-mineur-914.musicxml"
+                     },
+                     {
+                         "id":  "traumerei",
+                         "name":  "traumerei",
+                         "xml_url":  "./partitions/traumerei.musicxml"
+                     },
+                     {
+                         "id":  "valse-d-am-lie-poulain-de-yann-tiersen-niveau-2",
+                         "name":  "Valse d Am lie Poulain de Yann Tiersen niveau 2",
+                         "xml_url":  "./partitions/valse-d-am-lie-poulain-de-yann-tiersen-niveau-2.musicxml"
+                     },
+                     {
+                         "id":  "valse-op69-no2",
+                         "name":  "valse_op69_no2",
+                         "xml_url":  "./partitions/valse-op69-no2.musicxml"
+                     },
+                     {
+                         "id":  "valse-de-brahms",
+                         "name":  "valse-de-brahms",
+                         "xml_url":  "./partitions/valse-de-brahms.musicxml"
                      }
                  ]
 }
