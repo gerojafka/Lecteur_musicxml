@@ -1,5 +1,11 @@
-LECTEUR MUSICXML v26
-===================
+LECTEUR MUSICXML v28 — CORRECTION MIDI IPAD / CASIO
+====================================================
+La connexion MIDI est tentée automatiquement à l’ouverture, avec un bouton de
+reconnexion disponible. Le lecteur essaie d’abord Web MIDI avec SysEx activé,
+réessaie sans SysEx si nécessaire et recherche un périphérique pendant environ
+15 secondes s’il n’est pas immédiatement visible. Le cache hors ligne a été
+renouvelé afin que cette correction soit téléchargée depuis GitHub Pages.
+Si le son reste bloqué par iPadOS, touchez une fois l’interface puis rejouez.
 
 Ce lecteur dessine la partition a partir du MusicXML deja prepare par le
 convertisseur. Il ne lit pas le PDF et ne controle pas la reconnaissance.

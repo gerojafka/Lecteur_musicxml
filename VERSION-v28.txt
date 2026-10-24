@@ -1,0 +1,10 @@
+Lecteur MusicXML v28 — correction MIDI iPad / Casio
+
+- Connexion Web MIDI automatique au chargement, comme dans testmidi.
+- Demande d'accès MIDI avec SysEx activé, puis nouvel essai sans SysEx si nécessaire.
+- Détection compatible avec les listes d'entrées MIDI standard et les polyfills MIDIWeb.
+- Écoute des événements sur tous les ports MIDI, reconnexion et recherche pendant 15 secondes si le Casio apparaît en retard.
+- Cache du service worker renouvelé pour que GitHub Pages et l'iPad chargent la correction.
+
+La connexion MIDI et la lecture audio restent séparées : une interaction sur la page peut
+être nécessaire pour autoriser le son sur iPadOS.

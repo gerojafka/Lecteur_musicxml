@@ -25,7 +25,7 @@ if ($PSBoundParameters.ContainsKey('Action')) {
         if (-not (Test-Path -LiteralPath $workerPath)) { return }
         $utf8 = New-Object Text.UTF8Encoding($false)
         $worker = Get-Content -LiteralPath $workerPath -Raw -Encoding UTF8
-        $worker = $worker -replace "const VERSION='[^']+';", ("const VERSION='v26-" + [DateTime]::Now.ToString('yyyyMMddHHmmss') + "';")
+        $worker = $worker -replace "const VERSION='[^']+';", ("const VERSION='v28-" + [DateTime]::Now.ToString('yyyyMMddHHmmss') + "';")
         [IO.File]::WriteAllText($workerPath, $worker, $utf8)
     }
 
@@ -208,7 +208,7 @@ $root = $PSScriptRoot
 $libraryPath = Join-Path $root 'library.json'
 $library = Get-Content -LiteralPath $libraryPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $items = @($library.sessions)
-Write-Host 'Lecteur MusicXML v26 - Bibliotheque'
+Write-Host 'Lecteur MusicXML v28 - Bibliotheque'
 Write-Host '1. Ajouter un morceau'
 Write-Host '2. Retirer un morceau de la liste'
 Write-Host 'Entree : quitter'
@@ -251,7 +251,7 @@ $utf8 = New-Object Text.UTF8Encoding($false)
 [IO.File]::WriteAllText($libraryPath, (@{sessions=@($items)} | ConvertTo-Json -Depth 6), $utf8)
 $workerPath = Join-Path $root 'service-worker.js'
 $worker = Get-Content -LiteralPath $workerPath -Raw -Encoding UTF8
-$worker = $worker -replace "const VERSION='[^']+';", ("const VERSION='v26-" + [DateTime]::Now.ToString('yyyyMMddHHmmss') + "';")
+$worker = $worker -replace "const VERSION='[^']+';", ("const VERSION='v28-" + [DateTime]::Now.ToString('yyyyMMddHHmmss') + "';")
 [IO.File]::WriteAllText($workerPath, $worker, $utf8)
 Write-Host 'Bibliotheque mise a jour. Envoyez le dossier complet sur GitHub Pages.'
 Read-Host 'Entree pour fermer'

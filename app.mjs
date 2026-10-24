@@ -5,13 +5,14 @@ import {PianoAudio} from './audio.mjs';
 const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg';
 const readRecent=()=>{try{return JSON.parse(localStorage.getItem('v26-recent-scores'))||{}}catch{return{}}};
 const state={lang:localStorage.getItem('v26-lang')||'fr',mode:'continuous',playing:false,group:0,base:0,rate:1,loop:null,waitHits:new Set(),systems:[],notesById:new Map(),measuresById:new Map(),catalog:[],token:0,pair:-1,voices:new Set(),veilSetting:localStorage.getItem('v26-veil-color')||'#ec4a7b',veilColor:'#ec4a7b',veilMeasure:null,recent:readRecent()};
-const audio=new PianoAudio();let toolkit,raf,loopTimer,waitTimer,loading=false,midiAccess;
+const audio=new PianoAudio();let toolkit,raf,loopTimer,waitTimer,loading=false,midiAccess,midiPollTimer=null,midiPollCount=0,midiConnecting=false,midiConnected=false,midiAccessStateHandler=null;
+const midiInputBindings=new Map(),handledMidiEvents=new WeakSet();
 const translations={
- fr:{open:'Ouvrir',night:'Nuit',day:'Jour',continuous:'Défilement continu',wait:'Attendre la note',play:'▶ Lire',pause:'Ⅱ Pause',start:'⏮ Début',tempo:'Tempo',connect:'Connecter le Casio',connected:'MIDI connecté',keyboard:'Clavier',loop:'Boucle',from:'Début',to:'Fin',enable:'Activer',exit:'Quitter',gap:'Pause',welcome:'Votre partition, en musique.',choose:'Choisissez un MusicXML pour commencer.',loading:'Préparation de la partition…',piano:'Piano virtuel',touch:'Touchez les touches pour jouer',helpTitle:'Un lecteur autonome',helpText:'Ouvrez le MusicXML préparé par votre convertisseur. Le son et le curseur suivent les mêmes notes. Le PDF et le MIDI ne sont pas nécessaires.',helpKeys:'Espace : lecture / pause. ← et → : note précédente / suivante, avec son. ↑ et ↓ : tempo ±5 BPM. Cliquez sur une note pour vous y placer.',helpLoop:'Choisissez les mesures de début et de fin, puis Activez la boucle. Quitter retire la sélection. Les numéros entre parenthèses indiquent un passage répété.',helpLocal:'Les morceaux ouverts sont conservés sur cet appareil. Pour les publier sur GitHub, utilisez ajouter-partition.cmd puis envoyez le dossier complet.',close:'Fermer',measure:'Mesure',system:'Systèmes',ready:'Prêt à jouer',correct:'Correct',wrong:'Note différente',await:'Jouez les notes indiquées',finished:'Morceau terminé',loopPause:'Reprise dans',unsupported:'Web MIDI indisponible dans ce navigateur.',noMidi:'Aucun clavier MIDI détecté',denied:'Connexion MIDI refusée',error:'Impossible de lire ce MusicXML',remove:'Retirer ce morceau local ?',local:'local',emptyLibrary:'Ouvrir un MusicXML…'},
- en:{open:'Open',night:'Night',day:'Day',continuous:'Continuous',wait:'Wait for note',play:'▶ Play',pause:'Ⅱ Pause',start:'⏮ Start',tempo:'Tempo',connect:'Connect Casio',connected:'MIDI connected',keyboard:'Keyboard',loop:'Loop',from:'From',to:'To',enable:'Enable',exit:'Exit loop',gap:'Pause',welcome:'Your score, brought to life.',choose:'Choose a MusicXML file to begin.',loading:'Preparing your score…',piano:'Virtual piano',touch:'Tap the keys to play',helpTitle:'A standalone reader',helpText:'Open the MusicXML prepared by your converter. Audio and cursor follow the same notes. No PDF or MIDI file is required.',helpKeys:'Space: play / pause. ← and →: previous / next note, with sound. ↑ and ↓: tempo ±5 BPM. Click a note to move there.',helpLoop:'Choose the first and last measures, then Enable the loop. Exit loop clears the selection. Numbers in parentheses identify repeated passes.',helpLocal:'Opened scores are saved on this device. To publish them on GitHub, use ajouter-partition.cmd and upload the entire folder.',close:'Close',measure:'Measure',system:'Systems',ready:'Ready to play',correct:'Correct',wrong:'Different note',await:'Play the indicated notes',finished:'Piece complete',loopPause:'Restart in',unsupported:'Web MIDI is unavailable in this browser.',noMidi:'No MIDI keyboard detected',denied:'MIDI connection denied',error:'Unable to read this MusicXML',remove:'Remove this local score?',local:'local',emptyLibrary:'Open a MusicXML file…'}
+ fr:{open:'Ouvrir',night:'Nuit',day:'Jour',continuous:'Défilement continu',wait:'Attendre la note',play:'▶ Lire',pause:'Ⅱ Pause',start:'⏮ Début',tempo:'Tempo',connect:'Connecter le Casio',connected:'MIDI connecté',keyboard:'Clavier',loop:'Boucle',from:'Début',to:'Fin',enable:'Activer',exit:'Quitter',gap:'Pause',welcome:'Votre partition, en musique.',choose:'Choisissez un MusicXML pour commencer.',loading:'Préparation de la partition…',piano:'Piano virtuel',touch:'Touchez les touches pour jouer',helpTitle:'Un lecteur autonome',helpText:'Ouvrez le MusicXML préparé par votre convertisseur. Le son et le curseur suivent les mêmes notes. Le PDF et le MIDI ne sont pas nécessaires.',helpKeys:'Espace : lecture / pause. ← et → : note précédente / suivante, avec son. ↑ et ↓ : tempo ±5 BPM. Cliquez sur une note pour vous y placer.',helpLoop:'Choisissez les mesures de début et de fin, puis Activez la boucle. Quitter retire la sélection. Les numéros entre parenthèses indiquent un passage répété.',helpLocal:'Les morceaux ouverts sont conservés sur cet appareil. Pour les publier sur GitHub, utilisez ajouter-partition.cmd puis envoyez le dossier complet.',close:'Fermer',measure:'Mesure',system:'Systèmes',ready:'Prêt à jouer',correct:'Correct',wrong:'Note différente',await:'Jouez les notes indiquées',finished:'Morceau terminé',loopPause:'Reprise dans',unsupported:'Web MIDI indisponible dans ce navigateur.',searching:'Recherche du Casio…',noMidi:'Aucun clavier MIDI détecté',denied:'Connexion MIDI refusée',error:'Impossible de lire ce MusicXML',remove:'Retirer ce morceau local ?',local:'local',emptyLibrary:'Ouvrir un MusicXML…'},
+ en:{open:'Open',night:'Night',day:'Day',continuous:'Continuous',wait:'Wait for note',play:'▶ Play',pause:'Ⅱ Pause',start:'⏮ Start',tempo:'Tempo',connect:'Connect Casio',connected:'MIDI connected',keyboard:'Keyboard',loop:'Loop',from:'From',to:'To',enable:'Enable',exit:'Exit loop',gap:'Pause',welcome:'Your score, brought to life.',choose:'Choose a MusicXML file to begin.',loading:'Preparing your score…',piano:'Virtual piano',touch:'Tap the keys to play',helpTitle:'A standalone reader',helpText:'Open the MusicXML prepared by your converter. Audio and cursor follow the same notes. No PDF or MIDI file is required.',helpKeys:'Space: play / pause. ← and →: previous / next note, with sound. ↑ and ↓: tempo ±5 BPM. Click a note to move there.',helpLoop:'Choose the first and last measures, then Enable the loop. Exit loop clears the selection. Numbers in parentheses identify repeated passes.',helpLocal:'Opened scores are saved on this device. To publish them on GitHub, use ajouter-partition.cmd and upload the entire folder.',close:'Close',measure:'Measure',system:'Systems',ready:'Ready to play',correct:'Correct',wrong:'Different note',await:'Play the indicated notes',finished:'Piece complete',loopPause:'Restart in',unsupported:'Web MIDI is unavailable in this browser.',searching:'Searching for Casio…',noMidi:'No MIDI keyboard detected',denied:'MIDI connection denied',error:'Unable to read this MusicXML',remove:'Remove this local score?',local:'local',emptyLibrary:'Open a MusicXML file…'}
 };
 const tr=key=>translations[state.lang][key]||key;
-function translate(){document.documentElement.lang=state.lang==='en'?'en-US':'fr';document.querySelectorAll('[data-i18n]').forEach(e=>e.textContent=tr(e.dataset.i18n));$('lang').textContent=state.lang==='fr'?'EN':'FR';$('theme').textContent=tr(document.body.classList.contains('night')?'day':'night');$('mode').textContent=tr(state.mode);$('play').textContent=tr(state.playing?'pause':'play');$('loop').textContent=tr(state.loop?'exit':'enable');if(midiAccess)$('midi').textContent=tr('connected');updateTarget();}
+function translate(){document.documentElement.lang=state.lang==='en'?'en-US':'fr';document.querySelectorAll('[data-i18n]').forEach(e=>e.textContent=tr(e.dataset.i18n));$('lang').textContent=state.lang==='fr'?'EN':'FR';$('theme').textContent=tr(document.body.classList.contains('night')?'day':'night');$('mode').textContent=tr(state.mode);$('play').textContent=tr(state.playing?'pause':'play');$('loop').textContent=tr(state.loop?'exit':'enable');$('midi').textContent=tr(midiConnected?'connected':'connect');updateTarget();}
 function feedback(text,kind=''){$('feedback').textContent=text;$('feedback').className=kind}
 const noteName=p=>(state.lang==='en'?['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B']:['Do','Do♯','Ré','Ré♯','Mi','Fa','Fa♯','Sol','Sol♯','La','La♯','Si'])[p%12]+(Math.floor(p/12)-1);
 const clock=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
@@ -95,7 +96,7 @@ async function loadScore(record){
   const counts=new Map();for(const measure of timeline.measures){const meta=state.measuresById.get(measure.id);measure.meta=meta;const n=(counts.get(measure.id)||0)+1;counts.set(measure.id,n);measure.label=(meta?.label??String(measure.index+1))+(n>1?` (${n})`:'')}
   for(const group of timeline.groups){if(group.measure?.startX!==undefined)continue;const first=group.ids.map(id=>state.notesById.get(id)).find(Boolean);if(first)group.measure.startX=first.x}
   for(const select of [$('loopFrom'),$('loopTo')])select.replaceChildren(...timeline.measures.map(m=>new Option(m.label,String(m.index))));
-  $('loop').classList.remove('active');$('loop').textContent=tr('enable');buildPiano();updateTarget();feedback(tr('ready'));document.title=(record.name||'MusicXML')+' · Lecteur v26';
+  $('loop').classList.remove('active');$('loop').textContent=tr('enable');buildPiano();updateTarget();feedback(tr('ready'));document.title=(record.name||'MusicXML')+' · Lecteur v28';
  }catch(error){console.error(error);state.timeline=null;state.systems=[];state.pair=-1;$('systems').replaceChildren();$('empty').hidden=false;feedback(tr('error')+' — '+error.message,'bad')}
  finally{if(token===state.token){loading=false;setBusy(false)}}
 }
@@ -169,15 +170,95 @@ function paintKeyboard(){
  for(const key of $('piano').querySelectorAll('.key')){const pitch=+key.dataset.pitch;key.classList.toggle('expected',expected.has(pitch));key.setAttribute('aria-label',noteName(pitch));if(key.querySelector('.c-label'))key.querySelector('.c-label').textContent=noteName(pitch);if(expected.has(pitch)){const name=document.createElement('span');name.className='note-name';name.textContent=noteName(pitch);key.append(name)}}
 }
 async function inputNote(pitch,velocity=90){
- await audio.unlock();audio.play(pitch,0,2,velocity);const key=$('piano').querySelector(`[data-pitch="${pitch}"]`);key?.classList.add('pressed');
+ // Start audio without waiting for iPadOS: a suspended AudioContext must not block note recognition.
+ void audio.unlock().then(()=>audio.play(pitch,0,2,velocity)).catch(error=>console.warn('Audio indisponible pour la note MIDI',error));
+ const key=$('piano').querySelector(`[data-pitch="${pitch}"]`);key?.classList.add('pressed');
  const group=state.timeline?.groups[state.group];if(!group)return;const expected=new Set(group.notes.map(n=>n.pitch));
  const correct=expected.has(pitch);feedback(tr(correct?'correct':'wrong')+' · '+noteName(pitch),correct?'good':'bad');if(!correct){key?.classList.add('wrong');setTimeout(()=>key?.classList.remove('wrong'),300)}
  if(state.mode==='wait'&&state.playing&&correct&&!waitTimer){state.waitHits.add(pitch);if([...expected].every(p=>state.waitHits.has(p))){waitTimer=setTimeout(()=>{waitTimer=null;state.waitHits.clear();let next=firstPlayable(state.group+1);if(state.loop&&(next>=state.timeline.groups.length||state.timeline.groups[next].time>=state.loop.end)){loopPause();return}if(next>=state.timeline.groups.length){stop();state.base=0;state.group=0;updateTarget();feedback(tr('finished'));return}state.group=next;state.base=state.timeline.groups[next].time;updateTarget();feedback(tr('await'))},140)}}
 }
 function releaseNote(pitch){audio.release(pitch);$('piano').querySelector(`[data-pitch="${pitch}"]`)?.classList.remove('pressed')}
-async function connectMidi(){
- if(!navigator.requestMIDIAccess){feedback(tr('unsupported'),'bad');return}
- await audio.unlock();try{midiAccess=await navigator.requestMIDIAccess({sysex:false});const attach=()=>{const names=[];for(const port of midiAccess.inputs.values()){if(port.state==='disconnected')continue;names.push(port.name);port.onmidimessage=({data})=>{const[type,pitch,velocity]=data;if((type&240)===144&&velocity>0)inputNote(pitch,velocity);else if((type&240)===128||((type&240)===144&&velocity===0))releaseNote(pitch)}}$('midiState').textContent=names.join(' · ')||tr('noMidi');$('midi').textContent=names.length?tr('connected'):tr('connect')};midiAccess.onstatechange=attach;attach()}catch(error){feedback(tr('denied'),'bad')}
+// Read MIDIInputMap objects as well as arrays and legacy MIDIWeb polyfills.
+function listMidiInputs(access=midiAccess){
+ const collection=access?.inputs;if(!collection)return[];
+ const result=[],seen=new Set(),add=input=>{if(!input||typeof input!=='object'||seen.has(input)||input.state==='disconnected')return;seen.add(input);result.push(input)};
+ try{
+  if(typeof collection.values==='function'){
+   const iterator=collection.values();
+   if(iterator&&typeof iterator.next==='function'){let item=iterator.next();while(!item.done){add(item.value);item=iterator.next()}}
+   else if(iterator&&typeof iterator[Symbol.iterator]==='function')for(const input of iterator)add(input);
+  }
+ }catch{}
+ if(result.length===0&&typeof collection.forEach==='function')try{collection.forEach(input=>add(input))}catch{}
+ if(result.length===0&&Array.isArray(collection))collection.forEach(add);
+ if(result.length===0&&typeof collection==='object'){
+  try{for(const input of Object.values(collection)){if(input&&typeof input==='object'&&(input.name||input.id||'onmidimessage'in input||typeof input.addEventListener==='function'))add(input)}}catch{}
+ }
+ return result;
+}
+function handleMidiMessage(event,input){
+ if(!event||!event.data)return;
+ // Some MIDIWeb bridges dispatch through both onmidimessage and addEventListener.
+ if(typeof event==='object'){if(handledMidiEvents.has(event))return;handledMidiEvents.add(event)}
+ const data=event.data,status=Number(data[0]),pitch=Number(data[1]),velocity=data.length>2?Number(data[2]):64,command=status&0xf0;
+ if(!Number.isFinite(status)||!Number.isInteger(pitch)||pitch<0||pitch>127)return;
+ if(command===0x90&&velocity>0){void inputNote(pitch,velocity).catch(error=>console.warn('Erreur de lecture de la note MIDI',error))}
+ else if(command===0x80||(command===0x90&&velocity===0))releaseNote(pitch);
+}
+function bindMidiInput(input){
+ if(midiInputBindings.has(input))return;
+ const handler=event=>handleMidiMessage(event,input);let propertyBound=false,listenerBound=false;
+ try{input.onmidimessage=handler;propertyBound=true}catch{}
+ try{if(typeof input.addEventListener==='function'){input.addEventListener('midimessage',handler);listenerBound=true}}catch{}
+ midiInputBindings.set(input,{handler,propertyBound,listenerBound});
+}
+function unbindMidiInput(input,binding){
+ try{if(binding.propertyBound&&input.onmidimessage===binding.handler)input.onmidimessage=null}catch{}
+ try{if(binding.listenerBound&&typeof input.removeEventListener==='function')input.removeEventListener('midimessage',binding.handler)}catch{}
+ midiInputBindings.delete(input);
+}
+function stopMidiPolling(){if(midiPollTimer!==null){clearInterval(midiPollTimer);midiPollTimer=null}}
+function refreshMidiInputs(){
+ const inputs=listMidiInputs(),active=new Set(inputs);
+ for(const[input,binding]of midiInputBindings)if(!active.has(input))unbindMidiInput(input,binding);
+ inputs.forEach(bindMidiInput);midiConnected=inputs.length>0;
+ const names=inputs.map((input,index)=>input.name||input.manufacturer||`Périphérique MIDI ${index+1}`);
+ $('midiState').textContent=names.join(' · ')||(midiPollTimer!==null?tr('searching'):tr('noMidi'));
+ $('midi').textContent=tr(midiConnected?'connected':'connect');
+ if(midiConnected)stopMidiPolling();
+ return inputs.length;
+}
+function startMidiPolling(){
+ stopMidiPolling();midiPollCount=0;
+ if(refreshMidiInputs()>0)return;
+ midiPollTimer=setInterval(()=>{
+  midiPollCount++;
+  const found=refreshMidiInputs();
+  if(found||midiPollCount>=10){stopMidiPolling();if(!found)refreshMidiInputs()}
+ },1500);
+ refreshMidiInputs();
+}
+async function connectMidi({auto=false}={}){
+ if(midiConnecting)return;
+ if(!navigator.requestMIDIAccess){$('midiState').textContent=tr('unsupported');if(!auto)feedback(tr('unsupported'),'bad');return}
+ midiConnecting=true;$('midiState').textContent=tr('searching');
+ try{
+  let access;
+  // MIDIWeb works best with SysEx enabled; fall back for browsers that deny it.
+  try{access=await navigator.requestMIDIAccess({sysex:true})}
+  catch(sysexError){access=await navigator.requestMIDIAccess({sysex:false})}
+  if(midiAccess&&midiAccessStateHandler){try{if(midiAccess.onstatechange===midiAccessStateHandler)midiAccess.onstatechange=null}catch{};try{midiAccess.removeEventListener?.('statechange',midiAccessStateHandler)}catch{}}
+  midiAccess=access;
+  const onStateChange=()=>{if(refreshMidiInputs()===0&&midiPollTimer===null)startMidiPolling()};
+  midiAccessStateHandler=onStateChange;
+  try{midiAccess.onstatechange=onStateChange}catch{}
+  try{midiAccess.addEventListener?.('statechange',onStateChange)}catch{}
+  startMidiPolling();
+ }catch(error){
+  midiConnected=false;$('midi').textContent=tr('connect');$('midiState').textContent=tr('denied');
+  if(!auto)feedback(tr('denied'),'bad');
+  console.warn('Connexion MIDI impossible',error);
+ }finally{midiConnecting=false}
 }
 
 let database;
@@ -203,6 +284,6 @@ $('help').onclick=()=>$('helpDialog').showModal();$('closeHelp').onclick=()=>$('
 document.addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||$('helpDialog').open||e.ctrlKey||e.metaKey||e.altKey)return;if(e.repeat)return;const action={' ':()=>$('play').click(),ArrowLeft:()=>$('prev').click(),ArrowRight:()=>$('next').click(),ArrowUp:()=>$('faster').click(),ArrowDown:()=>$('slower').click()};if(action[e.key]){e.preventDefault();action[e.key]()}});
 window.addEventListener('resize',fitSystems);new ResizeObserver(fitSystems).observe($('score'));
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.playing)stop()});
-translate();buildPiano();const modulePromise=createModule();
+translate();buildPiano();void connectMidi({auto:true});const modulePromise=createModule();
 try{const response=await fetch('./library.json');if(response.ok){const data=await response.json();state.catalog=Array.isArray(data)?data:data.sessions||[]}state.catalog.push(...await storedScores());sortCatalog();refreshOptions();if(state.catalog.length)await loadScore(state.catalog[0])}catch(error){feedback(error.message,'bad')}
 if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./service-worker.js').catch(()=>{});

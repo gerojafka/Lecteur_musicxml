@@ -32,7 +32,7 @@ if __name__ == '__main__':
     else:
         raise SystemExit('Aucun port local disponible entre 8776 et 8795.')
     url=f'http://127.0.0.1:{port}/'
-    print(f'Lecteur MusicXML v26 : {url}', flush=True)
+    print(f'Lecteur MusicXML v28 : {url}', flush=True)
     print('Fermez cette fenetre pour arreter le lecteur local.', flush=True)
     if os.environ.get('PARTITION_MIDI_NO_BROWSER') != '1':
         threading.Timer(.5, lambda: webbrowser.open(url)).start()

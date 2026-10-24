@@ -1,6 +1,6 @@
 @echo off
 setlocal
-title Lecteur MusicXML v26
+title Lecteur MusicXML v28
 cd /d "%~dp0"
 set "READER_PYTHON=%LOCALAPPDATA%\Programs\Python\Python312\python.exe"
 if exist "%READER_PYTHON%" goto run
