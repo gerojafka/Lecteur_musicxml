@@ -96,7 +96,7 @@ async function loadScore(record){
   const counts=new Map();for(const measure of timeline.measures){const meta=state.measuresById.get(measure.id);measure.meta=meta;const n=(counts.get(measure.id)||0)+1;counts.set(measure.id,n);measure.label=(meta?.label??String(measure.index+1))+(n>1?` (${n})`:'')}
   for(const group of timeline.groups){if(group.measure?.startX!==undefined)continue;const first=group.ids.map(id=>state.notesById.get(id)).find(Boolean);if(first)group.measure.startX=first.x}
   for(const select of [$('loopFrom'),$('loopTo')])select.replaceChildren(...timeline.measures.map(m=>new Option(m.label,String(m.index))));
-  $('loop').classList.remove('active');$('loop').textContent=tr('enable');buildPiano();updateTarget();feedback(tr('ready'));document.title=(record.name||'MusicXML')+' · Lecteur v28';
+  $('loop').classList.remove('active');$('loop').textContent=tr('enable');buildPiano();updateTarget();feedback(tr('ready'));setTimeout(startWait,60);document.title=(record.name||'MusicXML')+' · Lecteur v28';
  }catch(error){console.error(error);state.timeline=null;state.systems=[];state.pair=-1;$('systems').replaceChildren();$('empty').hidden=false;feedback(tr('error')+' — '+error.message,'bad')}
  finally{if(token===state.token){loading=false;setBusy(false)}}
 }
@@ -129,14 +129,26 @@ function paintLoop(){
 }
 function currentTime(){return state.playing&&state.mode==='continuous'?state.base+(audio.ctx.currentTime-state.started)*state.rate:state.base}
 function stop(){clearTimeout(loopTimer);clearTimeout(waitTimer);loopTimer=null;waitTimer=null;if(state.playing&&state.mode==='continuous')state.base=currentTime();state.playing=false;state.loopWaiting=false;cancelAnimationFrame(raf);audio.silence();state.waitHits.clear();$('play').textContent=tr('play')}
-function seek(index,hear=false){stop();if(!state.timeline)return;state.group=Math.max(0,Math.min(state.timeline.groups.length-1,index));state.base=state.timeline.groups[state.group].time;updateTarget();if(hear)audition()}
+let inPlay=false;
+function seek(index,hear=false){stop();if(!state.timeline)return;state.group=Math.max(0,Math.min(state.timeline.groups.length-1,index));state.base=state.timeline.groups[state.group].time;updateTarget();if(hear)audition();if(!inPlay)startWait()}
 async function audition(){await audio.unlock();state.timeline?.groups[state.group]?.notes.forEach(n=>audio.play(n.pitch,0,Math.min(1.5,Math.max(.25,(n.end-n.start)/state.rate))))}
 function firstPlayable(index){while(index<state.timeline.groups.length-1&&!state.timeline.groups[index].notes.length)index++;return index}
+// Mode « Attendre » : toujours prêt, sans bouton Lire.
+function startWait(){
+ if(!state.timeline||loading||state.mode!=='wait'||state.playing||state.loopWaiting)return;
+ void audio.unlock().catch(()=>{});
+ if(state.loop&&(state.base<state.loop.start||state.base>=state.loop.end)){state.base=state.loop.start;state.group=groupAt(state.timeline.groups,state.base)}
+ state.waitHits.clear();state.playing=true;$('play').textContent=tr('pause');
+ state.group=firstPlayable(state.group);state.base=state.timeline.groups[state.group].time;updateTarget();feedback(tr('await'));
+}
 async function play(){
+ if(state.mode==='wait'&&state.timeline&&!loading){state.loopWaiting=false;startWait();return}
  if(!state.timeline||loading)return;await audio.unlock();
  rememberPlayed(state.record);
+ inPlay=true;try{
  if(state.base>=state.timeline.duration-.001)seek(0);
  if(state.loop&&(state.base<state.loop.start||state.base>=state.loop.end))seek(groupAt(state.timeline.groups,state.loop.start));
+ }finally{inPlay=false}
  state.waitHits.clear();state.playing=true;$('play').textContent=tr('pause');
  if(state.mode==='wait'){state.group=firstPlayable(state.group);state.base=state.timeline.groups[state.group].time;updateTarget();feedback(tr('await'));return}
  state.started=audio.ctx.currentTime;state.nextNote=state.timeline.notes.findIndex(n=>n.start>=state.base-.00001);if(state.nextNote<0)state.nextNote=state.timeline.notes.length;
@@ -175,7 +187,7 @@ async function inputNote(pitch,velocity=90){
  const key=$('piano').querySelector(`[data-pitch="${pitch}"]`);key?.classList.add('pressed');
  const group=state.timeline?.groups[state.group];if(!group)return;const expected=new Set(group.notes.map(n=>n.pitch));
  const correct=expected.has(pitch);feedback(tr(correct?'correct':'wrong')+' · '+noteName(pitch),correct?'good':'bad');if(!correct){key?.classList.add('wrong');setTimeout(()=>key?.classList.remove('wrong'),300)}
- if(state.mode==='wait'&&state.playing&&correct&&!waitTimer){state.waitHits.add(pitch);if([...expected].every(p=>state.waitHits.has(p))){waitTimer=setTimeout(()=>{waitTimer=null;state.waitHits.clear();let next=firstPlayable(state.group+1);if(state.loop&&(next>=state.timeline.groups.length||state.timeline.groups[next].time>=state.loop.end)){loopPause();return}if(next>=state.timeline.groups.length){stop();state.base=0;state.group=0;updateTarget();feedback(tr('finished'));return}state.group=next;state.base=state.timeline.groups[next].time;updateTarget();feedback(tr('await'))},140)}}
+ if(state.mode==='wait'&&state.playing&&correct&&!waitTimer){state.waitHits.add(pitch);if([...expected].every(p=>state.waitHits.has(p))){waitTimer=setTimeout(()=>{waitTimer=null;state.waitHits.clear();let next=firstPlayable(state.group+1);if(state.loop&&(next>=state.timeline.groups.length||state.timeline.groups[next].time>=state.loop.end)){loopPause();return}if(next>=state.timeline.groups.length||!state.timeline.groups[next].notes.length){stop();state.base=0;state.group=0;updateTarget();startWait();feedback(tr('finished'));return}state.group=next;state.base=state.timeline.groups[next].time;updateTarget();feedback(tr('await'))},140)}}
 }
 function releaseNote(pitch){audio.release(pitch);$('piano').querySelector(`[data-pitch="${pitch}"]`)?.classList.remove('pressed')}
 // Read MIDIInputMap objects as well as arrays and legacy MIDIWeb polyfills.
@@ -271,7 +283,7 @@ function rememberPlayed(record){if(!record?.id)return;state.recent[record.id]=Da
 async function openFiles(files){const records=[];for(const file of files){const record={id:'local-'+file.name,name:file.name.replace(/\.(musicxml|xml|mxl)$/i,''),filename:file.name,data:await file.arrayBuffer()};await persist(record);const old=state.catalog.findIndex(r=>r.id===record.id);if(old>=0)state.catalog[old]=record;else state.catalog.push(record);records.push(record)}refreshOptions();if(records.length){$('library').value=records[0].id;await loadScore(records[0])}}
 
 $('play').onclick=()=>state.playing||state.loopWaiting?stop():play();$('start').onclick=()=>{seek(0);feedback(tr('ready'))};$('prev').onclick=()=>state.timeline&&seek(noteStep(state.timeline.groups,state.group,-1),true);$('next').onclick=()=>state.timeline&&seek(noteStep(state.timeline.groups,state.group,1),true);
-$('mode').onclick=()=>{stop();state.mode=state.mode==='continuous'?'wait':'continuous';$('mode').textContent=tr(state.mode);feedback(tr(state.mode==='wait'?'await':'ready'))};
+$('mode').onclick=()=>{stop();state.mode=state.mode==='continuous'?'wait':'continuous';$('mode').textContent=tr(state.mode);if(state.mode==='wait'){state.base=0;state.group=0;startWait()}else{updateTarget();feedback(tr('ready'))}};
 $('tempo').oninput=e=>setTempo(+e.target.value);$('slower').onclick=()=>setTempo(+$('tempo').value-5);$('faster').onclick=()=>setTempo(+$('tempo').value+5);
 $('loop').onclick=()=>state.loop?clearLoop():changeLoop();$('loopFrom').onchange=$('loopTo').onchange=()=>{if(state.loop)changeLoop()};$('gap').oninput=()=>{$('gapValue').textContent=$('gap').value+' s'};
 $('veilColor').value=['#ec4a7b','#4a90e2','#35a77a','#d99425','#8b6bd9','random'].includes(state.veilSetting)?state.veilSetting:'custom';$('veilCustomColor').value=state.veilSetting==='random'?'#ec4a7b':state.veilSetting;

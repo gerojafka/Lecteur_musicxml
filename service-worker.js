@@ -1,4 +1,4 @@
-const VERSION='v28-midi-20261024072000';
+const VERSION='v28-attendre-20261025';
 const CACHE='musicxml-reader-'+VERSION;
 const CORE=['./','./index.html','./style.css','./app.mjs','./timeline.mjs','./audio.mjs','./library.json','./manifest.webmanifest','./assets/verovio.mjs','./assets/verovio-module.mjs'];
 self.addEventListener('install',event=>event.waitUntil((async()=>{
